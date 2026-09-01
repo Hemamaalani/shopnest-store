@@ -12,6 +12,10 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
 jobs:
   deploy:
     environment:
@@ -29,11 +33,14 @@ jobs:
         with:
           node-version: lts/*
           cache: npm
+          cache-dependency-path: shopnest-store/package-lock.json
 
       - name: Install dependencies
+        working-directory: shopnest-store
         run: npm ci
 
-      - name: Build
+      - name: Build ShopNest
+        working-directory: shopnest-store
         run: npm run build
 
       - name: Setup Pages
@@ -42,7 +49,7 @@ jobs:
       - name: Upload dist
         uses: actions/upload-pages-artifact@v4
         with:
-          path: ./dist
+          path: shopnest-store/dist
 
       - name: Deploy
         id: deployment
